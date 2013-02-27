@@ -54,11 +54,11 @@ void build(fs::path target)
             {
                 std::ostringstream cmd;
                 cmd << "g++ ";
+                std::set<std::string> libs;
                 for (auto &d: ds.dependencies)
                 {
                     cmd << d << " ";
                     std::ifstream f(d.native() + ".inc");
-                    std::set<std::string> libs;
                     while (f.good())
                     {
                         std::string s;
@@ -66,9 +66,9 @@ void build(fs::path target)
                         auto l = inc2lib[s];
                         libs.insert(begin(l), end(l));
                     }
-                    for (auto &i: libs)
-                        cmd << "-l" << i << " ";
                 }
+                for (auto &i: libs)
+                    cmd << "-l" << i << " ";
                 cmd << "-o " << target;
                 std::cout << cmd.str() << std::endl;
                 auto res = system(cmd.str().c_str());
@@ -138,6 +138,12 @@ int main()
     inc2lib["fcgio.h"].push_back("fcgi++");
     inc2lib["asio.hpp"].push_back("boost_system");
     inc2lib["asio.hpp"].push_back("pthread");
+    inc2lib["filesystem.hpp"].push_back("boost_system");
+    inc2lib["filesystem.hpp"].push_back("boost_filesystem");
+    inc2lib["regex.hpp"].push_back("boost_system");
+    inc2lib["regex.hpp"].push_back("boost_regex");
+    inc2lib["curl.h"].push_back("curl");
+    inc2lib["json_spirit.h"].push_back("json_spirit");
 
     auto dir = fs::current_path();
     auto target = dir.filename();
