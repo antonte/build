@@ -135,7 +135,9 @@ void build(fs::path target)
 int main()
 {
     inc2lib["glut.h"].push_back("glut");
+    inc2lib["glut.h"].push_back("GL");
     inc2lib["fcgio.h"].push_back("fcgi++");
+    inc2lib["fcgio.h"].push_back("fcgi");
     inc2lib["asio.hpp"].push_back("boost_system");
     inc2lib["asio.hpp"].push_back("pthread");
     inc2lib["filesystem.hpp"].push_back("boost_system");
@@ -144,7 +146,7 @@ int main()
     inc2lib["regex.hpp"].push_back("boost_regex");
     inc2lib["curl.h"].push_back("curl");
     inc2lib["json_spirit.h"].push_back("json_spirit");
-
+    
     auto dir = fs::current_path();
     auto target = dir.filename();
     if (fs::exists(dir) && fs::is_directory(dir))
