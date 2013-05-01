@@ -146,7 +146,12 @@ int main()
     inc2lib["regex.hpp"].push_back("boost_regex");
     inc2lib["curl.h"].push_back("curl");
     inc2lib["json_spirit.h"].push_back("json_spirit");
-    
+    inc2lib["json.h"].push_back("json");
+    inc2lib["speex_preprocess.h"].push_back("m");
+    inc2lib["speex_preprocess.h"].push_back("speexdsp");
+    inc2lib["gmpxx.h"].push_back("gmpxx");
+    inc2lib["gmpxx.h"].push_back("gmp");
+
     auto dir = fs::current_path();
     auto target = dir.filename();
     if (fs::exists(dir) && fs::is_directory(dir))
