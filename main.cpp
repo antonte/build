@@ -151,6 +151,7 @@ int main()
     inc2lib["speex_preprocess.h"].push_back("speexdsp");
     inc2lib["gmpxx.h"].push_back("gmpxx");
     inc2lib["gmpxx.h"].push_back("gmp");
+    inc2lib["simple.h"].push_back("pulse-simple");
 
     auto dir = fs::current_path();
     auto target = dir.filename();
