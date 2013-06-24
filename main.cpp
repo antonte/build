@@ -153,6 +153,7 @@ int main()
     inc2lib["gmpxx.h"].push_back("gmp");
     inc2lib["simple.h"].push_back("pulse-simple");
     inc2lib["hiredis.h"].push_back("hiredis");
+    inc2lib["png.h"].push_back("png");
 
     auto dir = fs::current_path();
     auto target = dir.filename();
