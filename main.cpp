@@ -154,7 +154,16 @@ int main()
     inc2lib["simple.h"].push_back("pulse-simple");
     inc2lib["hiredis.h"].push_back("hiredis");
     inc2lib["png.h"].push_back("png");
-
+    inc2lib["text_oarchive.hpp"].push_back("boost_serialization-mt");
+    inc2lib["text_iarchive.hpp"].push_back("boost_serialization-mt");
+    inc2lib["text_woarchive.hpp"].push_back("boost_serialization-mt");
+    inc2lib["text_wiarchive.hpp"].push_back("boost_serialization-mt");
+    inc2lib["xml_oarchive.hpp"].push_back("boost_serialization-mt");
+    inc2lib["xml_iarchive.hpp"].push_back("boost_serialization-mt");
+    inc2lib["xml_woarchive.hpp"].push_back("boost_serialization-mt");
+    inc2lib["xml_wiarchive.hpp"].push_back("boost_serialization-mt");
+    inc2lib["binary_oarchive.hpp"].push_back("boost_serialization-mt");
+    inc2lib["binary_iarchive.hpp"].push_back("boost_serialization-mt");
     auto dir = fs::current_path();
     auto target = dir.filename();
     if (fs::exists(dir) && fs::is_directory(dir))
