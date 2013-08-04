@@ -164,6 +164,7 @@ int main()
     inc2lib["xml_wiarchive.hpp"].push_back("boost_serialization-mt");
     inc2lib["binary_oarchive.hpp"].push_back("boost_serialization-mt");
     inc2lib["binary_iarchive.hpp"].push_back("boost_serialization-mt");
+    inc2lib["avformat.h"].push_back("avformat");
     auto dir = fs::current_path();
     auto target = dir.filename();
     if (fs::exists(dir) && fs::is_directory(dir))
