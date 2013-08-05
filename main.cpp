@@ -11,6 +11,8 @@
 
 namespace fs = boost::filesystem;
 
+bool release = false;
+
 struct Rule
 {
     enum ResolvingType { Link, Compile, MkDir };
@@ -81,6 +83,8 @@ void build(fs::path target)
                 {
                     std::ostringstream cmd;
                     cmd << "g++ -Wall -g -std=c++0x -c ";
+                    if (release)
+                        cmd << "-O3 ";
                     for (auto &d: ds.dependencies)
                         if (d.extension() == ".cpp")
                         {
@@ -96,6 +100,8 @@ void build(fs::path target)
                 {
                     std::ostringstream cmd;
                     cmd << "g++ -Wall -g -std=c++0x -MM -c ";
+                    if (release)
+                        cmd << "-O3 ";
                     for (auto &d: ds.dependencies)
                         if (d.extension() == ".cpp")
                         {
@@ -110,6 +116,8 @@ void build(fs::path target)
                 {
                     std::ostringstream cmd;
                     cmd << "g++ -Wall -g -std=c++0x -E -c ";
+                    if (release)
+                        cmd << "-O3 ";
                     for (auto &d: ds.dependencies)
                         if (d.extension() == ".cpp")
                         {
@@ -132,8 +140,9 @@ void build(fs::path target)
     ds.isResolved = true;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    release = (argc == 2 && argv[1] == std::string("release"));
     inc2lib["glut.h"].push_back("glut");
     inc2lib["glut.h"].push_back("GL");
     inc2lib["fcgio.h"].push_back("fcgi++");
@@ -165,6 +174,7 @@ int main()
     inc2lib["binary_oarchive.hpp"].push_back("boost_serialization-mt");
     inc2lib["binary_iarchive.hpp"].push_back("boost_serialization-mt");
     inc2lib["avformat.h"].push_back("avformat");
+    inc2lib["avdevice.h"].push_back("avdevice");
     auto dir = fs::current_path();
     auto target = dir.filename();
     if (fs::exists(dir) && fs::is_directory(dir))
