@@ -175,6 +175,9 @@ int main(int argc, char *argv[])
     inc2lib["binary_iarchive.hpp"].push_back("boost_serialization-mt");
     inc2lib["avformat.h"].push_back("avformat");
     inc2lib["avdevice.h"].push_back("avdevice");
+    inc2lib["rc4.h"].push_back("crypto");
+    inc2lib["evp.h"].push_back("ssl");
+    inc2lib["evp.h"].push_back("crypto");
     auto dir = fs::current_path();
     auto target = dir.filename();
     if (fs::exists(dir) && fs::is_directory(dir))
