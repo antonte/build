@@ -178,6 +178,8 @@ int main(int argc, char *argv[])
     inc2lib["rc4.h"].push_back("crypto");
     inc2lib["evp.h"].push_back("ssl");
     inc2lib["evp.h"].push_back("crypto");
+    inc2lib["tinyxml.h"].push_back("tinyxml");
+    inc2lib["thread"].push_back("pthread");
     auto dir = fs::current_path();
     auto target = dir.filename();
     if (fs::exists(dir) && fs::is_directory(dir))
