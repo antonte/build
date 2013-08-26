@@ -180,6 +180,7 @@ int main(int argc, char *argv[])
     inc2lib["evp.h"].push_back("crypto");
     inc2lib["tinyxml.h"].push_back("tinyxml");
     inc2lib["thread"].push_back("pthread");
+    inc2lib["swscale.h"].push_back("swscale");
     auto dir = fs::current_path();
     auto target = dir.filename();
     if (fs::exists(dir) && fs::is_directory(dir))
