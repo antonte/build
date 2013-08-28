@@ -181,6 +181,9 @@ int main(int argc, char *argv[])
     inc2lib["tinyxml.h"].push_back("tinyxml");
     inc2lib["thread"].push_back("pthread");
     inc2lib["swscale.h"].push_back("swscale");
+    inc2lib["fftw3.h"].push_back("fftw3");
+    inc2lib["fftw3.h"].push_back("m");
+
     auto dir = fs::current_path();
     auto target = dir.filename();
     if (fs::exists(dir) && fs::is_directory(dir))
