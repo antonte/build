@@ -183,6 +183,8 @@ int main(int argc, char *argv[])
     inc2lib["swscale.h"].push_back("swscale");
     inc2lib["fftw3.h"].push_back("fftw3");
     inc2lib["fftw3.h"].push_back("m");
+    inc2lib["zmq.h"].push_back("zmq");
+    inc2lib["zmq.hpp"].push_back("zmq");
 
     auto dir = fs::current_path();
     auto target = dir.filename();
