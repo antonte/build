@@ -185,6 +185,8 @@ int main(int argc, char *argv[])
     inc2lib["fftw3.h"].push_back("m");
     inc2lib["zmq.h"].push_back("zmq");
     inc2lib["zmq.hpp"].push_back("zmq");
+    inc2lib["amqp.h"].push_back("rabbitmq");
+    inc2lib["amqp_framing.h"].push_back("rabbitmq");
 
     auto dir = fs::current_path();
     auto target = dir.filename();
