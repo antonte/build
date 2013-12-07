@@ -187,7 +187,8 @@ int main(int argc, char *argv[])
     inc2lib["zmq.hpp"].push_back("zmq");
     inc2lib["amqp.h"].push_back("rabbitmq");
     inc2lib["amqp_framing.h"].push_back("rabbitmq");
-
+    inc2lib["SDL.h"].push_back("SDL");
+    
     auto dir = fs::current_path();
     auto target = dir.filename();
     if (fs::exists(dir) && fs::is_directory(dir))
