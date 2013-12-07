@@ -145,6 +145,7 @@ int main(int argc, char *argv[])
     release = (argc == 2 && argv[1] == std::string("release"));
     inc2lib["glut.h"].push_back("glut");
     inc2lib["glut.h"].push_back("GL");
+    inc2lib["gl.h"].push_back("GL");
     inc2lib["fcgio.h"].push_back("fcgi++");
     inc2lib["fcgio.h"].push_back("fcgi");
     inc2lib["asio.hpp"].push_back("boost_system");
