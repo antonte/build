@@ -216,6 +216,7 @@ int main(int argc, char *argv[])
                         while (f.good())
                         {
                             f >> s;
+                            if (s != "\\")
                             dependencies[obj].dependencies.push_back(s);
                         }
                     }
@@ -228,8 +229,9 @@ int main(int argc, char *argv[])
     {
         build(target);
     }
-    catch (std::runtime_error &)
+    catch (std::runtime_error &e)
     {
+        std::cerr << e.what() << std::endl;
         return 1;
     }
 }
