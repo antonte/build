@@ -189,6 +189,7 @@ int main(int argc, char *argv[])
     inc2lib["amqp.h"].push_back("rabbitmq");
     inc2lib["amqp_framing.h"].push_back("rabbitmq");
     inc2lib["SDL.h"].push_back("SDL2");
+    inc2lib["SDL_ttf.h"].push_back("SDL2_ttf");
     
     auto dir = fs::current_path();
     auto target = dir.filename();
