@@ -55,7 +55,7 @@ void build(fs::path target)
         case Rule::Link:
             {
                 std::ostringstream cmd;
-                cmd << "g++ ";
+                cmd << "g++ -march=native";
                 std::set<std::string> libs;
                 for (auto &d: ds.dependencies)
                 {
@@ -82,7 +82,7 @@ void build(fs::path target)
             {
                 {
                     std::ostringstream cmd;
-                    cmd << "g++ -Wall -g -std=c++0x -c ";
+                    cmd << "g++ -Wall -march=native -g -std=c++0x -c ";
                     if (release)
                         cmd << "-O3 ";
                     for (auto &d: ds.dependencies)
@@ -99,7 +99,7 @@ void build(fs::path target)
                 }
                 {
                     std::ostringstream cmd;
-                    cmd << "g++ -Wall -g -std=c++0x -MM -c ";
+                    cmd << "g++ -Wall -march=native -g -std=c++0x -MM -c ";
                     if (release)
                         cmd << "-O3 ";
                     for (auto &d: ds.dependencies)
@@ -115,7 +115,7 @@ void build(fs::path target)
                 }
                 {
                     std::ostringstream cmd;
-                    cmd << "g++ -Wall -g -std=c++0x -E -c ";
+                    cmd << "g++ -Wall -march=native -g -std=c++0x -E -c ";
                     if (release)
                         cmd << "-O3 ";
                     for (auto &d: ds.dependencies)
