@@ -55,7 +55,7 @@ void build(fs::path target)
         case Rule::Link:
             {
                 std::ostringstream cmd;
-                cmd << "g++ -march=native";
+                cmd << "g++ -march=native ";
                 std::set<std::string> libs;
                 for (auto &d: ds.dependencies)
                 {
