@@ -87,12 +87,7 @@ void build(std::string target)
 {
     auto ids = dependencies.find(target);
     if (ids == dependencies.end())
-    {
-        if (exists(target))
-            return;
-        else
-            throw std::runtime_error("There is not rule for " + target);
-    }
+        return;
     auto ds = ids->second; // make hard copy
     if (ds.isResolved)
         return;
@@ -139,7 +134,7 @@ void build(std::string target)
             {
                 {
                     std::ostringstream cmd;
-                    cmd << "g++ -Wall -march=native -g -std=c++0x -c ";
+                    cmd << "g++ -Wall -march=native -g -std=c++11 -c ";
                     if (release)
                         cmd << "-O3 ";
                     for (auto &d: ds.dependencies)
@@ -156,7 +151,7 @@ void build(std::string target)
                 }
                 {
                     std::ostringstream cmd;
-                    cmd << "g++ -Wall -march=native -g -std=c++0x -MM -c ";
+                    cmd << "g++ -Wall -march=native -g -std=c++11 -MM -c ";
                     if (release)
                         cmd << "-O3 ";
                     for (auto &d: ds.dependencies)
@@ -172,7 +167,7 @@ void build(std::string target)
                 }
                 {
                     std::ostringstream cmd;
-                    cmd << "g++ -Wall -march=native -g -std=c++0x -E -c ";
+                    cmd << "g++ -Wall -march=native -g -std=c++11 -E -c ";
                     if (release)
                         cmd << "-O3 ";
                     for (auto &d: ds.dependencies)
