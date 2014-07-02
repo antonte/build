@@ -1,15 +1,20 @@
-// g++ main.cpp -o build -g -Wall -lboost_system -lboost_filesystem -std=c++0x
+// g++ main.cpp -o build -g -Wall -std=c++0x
 #include <cstdlib>
 #include <iostream>
 #include <string>
-#include <boost/filesystem.hpp>
 #include <map>
 #include <sstream>
 #include <exception>
 #include <fstream>
 #include <set>
-
-namespace fs = boost::filesystem;
+#include <vector>
+#include <stdexcept>
+#include <cassert>
+#include <memory>
+#include <sys/types.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 bool release = false;
 
@@ -17,36 +22,88 @@ struct Rule
 {
     enum ResolvingType { Link, Compile, MkDir };
     Rule(): isResolved(false) {}
-    std::vector<fs::path> dependencies;
+    std::vector<std::string> dependencies;
     ResolvingType resolvingType;
     bool isResolved;
 };
 
-std::map<fs::path, Rule> dependencies;
+std::map<std::string, Rule> dependencies;
 
 std::map<std::string, std::vector<std::string>> inc2lib;
 
-void build(fs::path target)
+bool exists(std::string fileName)
+{
+    return std::ifstream(fileName).good();
+}
+
+time_t last_write_time(std::string fileName)
+{
+  struct stat buffer;   
+  if (stat(fileName.c_str(), &buffer) != 0)
+      return 0;
+  return buffer.st_mtime;
+}
+
+bool is_directory(std::string fileName)
+{
+    struct stat buffer;   
+    if (stat(fileName.c_str(), &buffer) != 0)
+        return false;
+    return buffer.st_mode & S_IFDIR;
+}
+
+std::string extension(std::string fileName)
+{
+    auto idx = fileName.rfind('.');
+    return idx != std::string::npos ? fileName.substr(idx + 1) : "";
+}
+
+void create_directory(std::string dir)
+{
+    mkdir(dir.c_str(), 0777);
+}
+
+std::string current_path()
+{
+    std::string res;
+    char *cres = getcwd(nullptr, 0);
+    res = cres;
+    free(cres);
+    return res;
+}
+
+std::string filename(std::string fileName)
+{
+    auto idx = fileName.rfind('/');
+    return idx != std::string::npos ? fileName.substr(idx + 1) : "";
+}
+
+std::string replace_extension(std::string path, std::string ext)
+{
+    return path + "." + ext;
+}
+
+void build(std::string target)
 {
     auto ids = dependencies.find(target);
     if (ids == dependencies.end())
     {
-        if (fs::exists(target))
+        if (exists(target))
             return;
         else
-            throw std::runtime_error("There is not rule for " + target.native());
+            throw std::runtime_error("There is not rule for " + target);
     }
     auto ds = ids->second; // make hard copy
     if (ds.isResolved)
         return;
-    bool outOfDate = !fs::exists(target);
-    auto ts = outOfDate ? 0 : fs::last_write_time(target);
+    bool outOfDate = !exists(target);
+    auto ts = outOfDate ? 0 : last_write_time(target);
     auto dependencies = ds.dependencies; // make hard copy
     for (auto &d: dependencies)
     {
         build(d);
-        if (!fs::is_directory(d))
-            outOfDate = outOfDate || (ts < fs::last_write_time(d));
+        if (!is_directory(d))
+            outOfDate = outOfDate || (ts < last_write_time(d));
     }
     if (outOfDate)
     {
@@ -60,7 +117,7 @@ void build(fs::path target)
                 for (auto &d: ds.dependencies)
                 {
                     cmd << d << " ";
-                    std::ifstream f(d.native() + ".inc");
+                    std::ifstream f(d + ".inc");
                     while (f.good())
                     {
                         std::string s;
@@ -86,7 +143,7 @@ void build(fs::path target)
                     if (release)
                         cmd << "-O3 ";
                     for (auto &d: ds.dependencies)
-                        if (d.extension() == ".cpp")
+                        if (extension(d) == "cpp")
                         {
                             cmd << d;
                             break;
@@ -103,7 +160,7 @@ void build(fs::path target)
                     if (release)
                         cmd << "-O3 ";
                     for (auto &d: ds.dependencies)
-                        if (d.extension() == ".cpp")
+                        if (extension(d) == "cpp")
                         {
                             cmd << d;
                             break;
@@ -119,7 +176,7 @@ void build(fs::path target)
                     if (release)
                         cmd << "-O3 ";
                     for (auto &d: ds.dependencies)
-                        if (d.extension() == ".cpp")
+                        if (extension(d) == "cpp")
                         {
                             cmd << d;
                             break;
@@ -132,11 +189,11 @@ void build(fs::path target)
             }
             break;
         case Rule::MkDir:
-            fs::create_directory(target);
+            create_directory(target);
             break;
         }
     }
-    assert(fs::exists(target));
+    assert(exists(target));
     ds.isResolved = true;
 }
 
@@ -195,27 +252,28 @@ int main(int argc, char *argv[])
     inc2lib["Xutil.h"].push_back("X11");
     inc2lib["Xos.h"].push_back("X11");
     
-    auto dir = fs::current_path();
-    auto target = dir.filename();
-    if (fs::exists(dir) && fs::is_directory(dir))
+    auto dir = current_path();
+    auto target = filename(dir);
+    if (exists(dir) && is_directory(dir))
     {
-        fs::directory_iterator endIter;
-        for (fs::directory_iterator i(dir); i != endIter; ++i)
-            if (fs::is_regular_file(i->status()))
+        std::unique_ptr<DIR, decltype(&closedir)> d(opendir(dir.c_str()), &closedir);
+        while (auto de = readdir(d.get()))
+        {
+            if (de->d_type == DT_REG)
             {
-                auto ext = i->path().extension();
-                auto path = i->path();
-                if (path.extension() == ".cpp")
+                auto ext = extension(de->d_name);
+                auto path = de->d_name;
+                if (ext == "cpp")
                 {
-                    auto obj = fs::path("tmp") / (path.replace_extension().filename().native() +  ".o");
+                    auto obj = "tmp/" + replace_extension(path, "o");
                     dependencies[target].dependencies.push_back(obj);
                     dependencies[target].resolvingType = Rule::Link;
                     dependencies[obj].dependencies.push_back("tmp");
                     dependencies["tmp"].resolvingType = Rule::MkDir;
                     dependencies[obj].resolvingType = Rule::Compile;
-                    if (fs::exists(obj.native() + ".dep"))
+                    if (exists(obj + ".dep"))
                     {
-                        std::ifstream f(obj.native() + ".dep");
+                        std::ifstream f(obj + ".dep");
                         std::string s;
                         f >> s;
                         while (f.good())
@@ -226,9 +284,10 @@ int main(int argc, char *argv[])
                         }
                     }
                     else
-                        dependencies[obj].dependencies.push_back(i->path().filename());
+                        dependencies[obj].dependencies.push_back(path);
                 }
             }
+        }
     }
     try
     {
