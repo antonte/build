@@ -1,3 +1,3 @@
 #!/bin/bash
-g++ main.cpp -o build -g -Wall -lboost_system -lboost_filesystem -std=c++0x && \
+g++ *.cpp -o build -g -Wall -std=c++11 && \
 mv build ~/bin/build
