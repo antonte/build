@@ -1,6 +1,6 @@
 #include "bin_rule.hpp"
 #include "obj_rule.hpp"
-#include "inc2lib.hpp"
+#include "config.hpp"
 #include "utils.hpp"
 #include <memory>
 #include <sstream>

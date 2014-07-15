@@ -1,15 +1,28 @@
 #include "obj_rule.hpp"
 #include "utils.hpp"
 #include "file_rule.hpp"
-#include "inc2lib.hpp"
+#include "config.hpp"
 #include <sstream>
 #include <iostream>
+#include <fstream>
 
 ObjRule::ObjRule(std::string sourceFile):
     sourceFile_(sourceFile)
 {
     target_ = "tmp/" + replace_extension(sourceFile, "o");
     dependencies_.push_back(std::unique_ptr<FileRule>(new FileRule(sourceFile)));
+    if (exists(target_ + ".dep"))
+    {
+        std::ifstream f(target_ + ".dep");
+        std::string s;
+        f >> s;
+        while (f.good())
+        {
+            f >> s;
+            if (s != "\\")
+                dependencies_.push_back(std::unique_ptr<FileRule>(new FileRule(s)));
+        }
+    }
 }
 
 void ObjRule::internalResolve()

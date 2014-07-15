@@ -20,10 +20,9 @@ void Rule::resolve()
     for (auto &d: dependencies_)
     {
         d->resolve();
-        outOfDate = outOfDate || (ts < last_write_time(d->target_));
+        outOfDate = outOfDate || !exists(d->target_) || (ts < last_write_time(d->target_));
     }
     if (outOfDate)
         internalResolve();
-    assert(exists(target_));
     isResolved_ = true;
 }

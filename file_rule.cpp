@@ -1,6 +1,7 @@
 #include "file_rule.hpp"
 #include <stdexcept>
 #include <sstream>
+#include <iostream>
 
 FileRule::FileRule(std::string target)
 {
@@ -9,7 +10,4 @@ FileRule::FileRule(std::string target)
 
 void FileRule::internalResolve()
 {
-    std::ostringstream strm;
-    strm << "The file '" << target_ << "' is missing";
-    throw std::runtime_error(strm.str());
 }
