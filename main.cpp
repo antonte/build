@@ -1,24 +1,7 @@
 // g++ *.cpp -o build -g -Wall -std=c++11
 #include "bin_rule.hpp"
-#include "utils.hpp"
-#include "inc2lib.hpp"
-#include <cstdlib>
+#include "config.hpp"
 #include <iostream>
-#include <string>
-#include <map>
-#include <sstream>
-#include <exception>
-#include <fstream>
-#include <set>
-#include <vector>
-#include <stdexcept>
-#include <cassert>
-#include <memory>
-#include <sys/types.h>
-#include <dirent.h>
-
-bool release = false;
-std::map<std::string, std::vector<std::string>> inc2lib;
 
 int main(int argc, char *argv[])
 {

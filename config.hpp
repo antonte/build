@@ -5,3 +5,6 @@
 
 extern std::map<std::string, std::vector<std::string>> inc2lib;
 extern bool release;
+extern std::string incDir;
+extern std::string libDir;
+extern std::string cfgDir;
