@@ -32,6 +32,8 @@ void ObjRule::internalResolve()
         cmd << "g++ -Wall -march=native -g -std=c++11 -c ";
         if (release)
             cmd << "-O3 ";
+        if (exists(incDir))
+            cmd << "-I" << incDir << " ";
         cmd << sourceFile_;
         cmd << " -o " << target_;
         std::cout << cmd.str() << std::endl;
@@ -44,6 +46,8 @@ void ObjRule::internalResolve()
         cmd << "g++ -Wall -march=native -g -std=c++11 -MM -c ";
         if (release)
             cmd << "-O3 ";
+        if (exists(incDir))
+            cmd << "-I" << incDir << " ";
         for (auto &d: dependencies_)
             if (extension(d->target()) == "cpp")
             {
@@ -60,13 +64,15 @@ void ObjRule::internalResolve()
         cmd << "g++ -Wall -march=native -g -std=c++11 -E -c ";
         if (release)
             cmd << "-O3 ";
+        if (exists(incDir))
+            cmd << "-I" << incDir << " ";
         for (auto &d: dependencies_)
             if (extension(d->target()) == "cpp")
             {
                 cmd << d->target();
                 break;
             }
-        cmd << " | grep ^#.*include | awk '{ print $3 }' | sort | uniq | sed 's/^.*\\///' | sed 's/\"//' > " << target_ << ".inc";
+        cmd << " | grep ^# | awk '{ print $3 }' | sort | uniq | sed 's/^.*\\///' | sed 's/\"//g' > " << target_ << ".inc";
         auto res = system(cmd.str().c_str());
         if (res != 0)
             throw std::runtime_error("Compiling error");

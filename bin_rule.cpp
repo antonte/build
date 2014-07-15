@@ -4,16 +4,20 @@
 #include "utils.hpp"
 #include <memory>
 #include <sstream>
-#include <set>
 #include <fstream>
 #include <iostream>
+#include <set>
+#include <vector>
 #include <sys/types.h>
 #include <dirent.h>
 
 BinRule::BinRule()
 {
     create_directory("tmp");
-    target_ = filename(current_path());
+    if (!archive)
+        target_ = filename(current_path());
+    else
+        target_ = "lib" + filename(current_path()) + ".a";
     std::unique_ptr<DIR, decltype(&closedir)> d(opendir("."), &closedir);
     while (auto de = readdir(d.get()))
         if (de->d_type == DT_REG && extension(de->d_name) == "cpp")
@@ -22,26 +26,104 @@ BinRule::BinRule()
 
 void BinRule::internalResolve()
 {
-    std::ostringstream cmd;
-    cmd << "g++ -march=native ";
-    std::set<std::string> libs;
-    for (auto &d: dependencies_)
+    std::vector<std::string> libs;
+    if (!archive)
     {
-        cmd << d->target() << " ";
-        std::ifstream f(d->target() + ".inc");
-        while (f.good())
+        std::ostringstream cmd;
+        cmd << "g++ -march=native ";
+        if (exists(libDir))
+            cmd << "-L" << libDir << " ";
+        for (auto &d: dependencies_)
         {
-            std::string s;
-            f >> s;
-            auto l = inc2lib[s];
-            libs.insert(begin(l), end(l));
+            cmd << d->target() << " ";
+            std::ifstream f(d->target() + ".inc");
+            while (f.good())
+            {
+                std::string s;
+                f >> s;
+                auto l = inc2lib[s];
+                libs.insert(end(libs), begin(l), end(l));
+            }
         }
+        std::set<std::string> uniqueLibs;
+        for (auto &i: libs)
+            if (i != target_)
+                if (uniqueLibs.find(i) == std::end(uniqueLibs))
+                {
+                    cmd << "-l" << i << " ";
+                    uniqueLibs.insert(i);
+                }
+        cmd << "-o " << target_;
+        std::cout << cmd.str() << std::endl;
+        auto res = system(cmd.str().c_str());
+        if (res != 0)
+            throw std::runtime_error("Linking error");
     }
-    for (auto &i: libs)
-        cmd << "-l" << i << " ";
-    cmd << "-o " << target_;
-    std::cout << cmd.str() << std::endl;
-    auto res = system(cmd.str().c_str());
-    if (res != 0)
-        throw std::runtime_error("Linking error");
+    else
+    {
+        {
+            std::ostringstream cmd;
+            cmd << "ar r ";
+            cmd << target_;
+            for (auto &d: dependencies_)
+            {
+                cmd << " " << d->target();
+                std::ifstream f(d->target() + ".inc");
+                while (f.good())
+                {
+                    std::string s;
+                    f >> s;
+                    auto l = inc2lib[s];
+                    libs.insert(end(libs), begin(l), end(l));
+                }
+            }
+            std::cout << cmd.str() << std::endl;
+            auto res = system(cmd.str().c_str());
+            if (res != 0)
+                throw std::runtime_error("Linking error");
+        }
+        {
+            std::ostringstream cmd;
+            cmd << "mkdir -p " << incDir << "/a/";
+            auto res = system(cmd.str().c_str());
+            if (res != 0)
+                throw std::runtime_error("Cannot create a directory ");
+        }
+        {
+            std::ostringstream cmd;
+            cmd << "mkdir -p " << libDir;
+            auto res = system(cmd.str().c_str());
+            if (res != 0)
+                throw std::runtime_error("Cannot create a directory ");
+        }
+        {
+            std::ostringstream cmd;
+            cmd << "mkdir -p " << cfgDir;
+            auto res = system(cmd.str().c_str());
+            if (res != 0)
+                throw std::runtime_error("Cannot create a directory ");
+        }
+        
+        std::ofstream f(cfgDir + "/" + target_ + ".cfg");
+        std::unique_ptr<DIR, decltype(&closedir)> d(opendir("."), &closedir);
+        while (auto de = readdir(d.get()))
+            if (de->d_type == DT_REG && extension(de->d_name) == "hpp")
+            {
+                std::ostringstream cmd;
+                cmd << "ln -sf " << absolutePath(de->d_name) << " " << incDir << "/a/" << de->d_name;
+                std::cout << cmd.str() << std::endl;
+                auto res = system(cmd.str().c_str());
+                if (res != 0)
+                    throw std::runtime_error("Cannot link a header file");
+                f << de->d_name << " " << filename(current_path()) << std::endl;
+                for (auto &i: libs)
+                    f << de->d_name << " " << i << std::endl;
+            }
+        std::ostringstream cmd;
+        cmd << "ln -sf " << absolutePath(target_) << " " << libDir << "/" << target_;
+        std::cout << cmd.str() << std::endl;
+        auto res = system(cmd.str().c_str());
+        if (res != 0)
+            throw std::runtime_error("Cannot link a static library (archive) file");
+    }
 }

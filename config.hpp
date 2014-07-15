@@ -8,5 +8,5 @@ extern bool release;
 extern std::string incDir;
 extern std::string libDir;
 extern std::string cfgDir;
-
+extern bool archive;
 void readConfig();

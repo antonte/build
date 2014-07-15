@@ -1,44 +1,23 @@
 #include "config.hpp"
+#include "utils.hpp"
 #include <unistd.h>
-#include <sys/param.h>
 #include <fstream>
 #include <sstream>
+#include <memory>
+#include <iostream>
+#include <sys/types.h>
+#include <dirent.h>
 
 bool release = false;
 std::map<std::string, std::vector<std::string>> inc2lib;
+std::string incDir;
+std::string libDir;
+std::string cfgDir;
+bool archive;
 
-static std::string absolutePath(std::string path)
+static void readConfig(std::string configFileName)
 {
-  char * tmp = realpath(path.c_str(), NULL);
-  if (tmp)
-  {
-    std::string res = tmp;
-    free(tmp);
-    return res;
-  }
-  else
-    return path;
-}
-
-static std::string getExecutableName()
-{
-  char buf[MAXPATHLEN];
-  ssize_t len;
-  if ((len = readlink("/proc/self/exe", buf, sizeof(buf) - 1)) != -1)
-    buf[len] = '\0';
-  return buf;
-}
-
-static std::string getConfigFileName()
-{
-  auto exec = getExecutableName();
-  auto execDir = exec.substr(0, exec.rfind("/"));
-  return absolutePath(execDir + "/build.cfg");
-}
-
-void readConfig()
-{
-    std::ifstream cfg(getConfigFileName());
+    std::ifstream cfg(configFileName);
     while (cfg.good())
     {
         std::string line;
@@ -52,4 +31,27 @@ void readConfig()
             inc2lib[include].push_back(library);
         }
     }
+}
+
+
+void readConfig()
+{
+    auto exec = getExecutableName();
+    auto execDir = exec.substr(0, exec.rfind("/"));
+    auto configFileName = absolutePath(execDir + "/build.cfg");
+    readConfig(configFileName);
+
+    cfgDir = absolutePath(execDir + "/../a/build.d");
+    std::unique_ptr<DIR, decltype(&closedir)> d(opendir(cfgDir.c_str()), &closedir);
+    if (d)
+        while (auto de = readdir(d.get()))
+        {
+            if (de->d_type == DT_REG && extension(de->d_name) == "cfg")
+            {
+                readConfig(cfgDir + "/" + de->d_name);
+            }
+        }
+
+    incDir = absolutePath(execDir + "/../a/include");
+    libDir = absolutePath(execDir + "/../a/lib");
 }

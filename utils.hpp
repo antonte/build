@@ -10,3 +10,5 @@ void create_directory(std::string dir);
 std::string current_path();
 std::string filename(std::string fileName);
 std::string replace_extension(std::string path, std::string ext);
+std::string absolutePath(std::string path);
+std::string getExecutableName();

@@ -4,6 +4,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/param.h>
 
 
 bool exists(std::string fileName)
@@ -56,4 +57,26 @@ std::string filename(std::string fileName)
 std::string replace_extension(std::string path, std::string ext)
 {
     return path + "." + ext;
+}
+
+std::string absolutePath(std::string path)
+{
+    char * tmp = realpath(path.c_str(), NULL);
+    if (tmp)
+    {
+        std::string res = tmp;
+        free(tmp);
+        return res;
+    }
+    else
+        return path;
+}
+
+std::string getExecutableName()
+{
+    char buf[MAXPATHLEN];
+    ssize_t len;
+    if ((len = readlink("/proc/self/exe", buf, sizeof(buf) - 1)) != -1)
+        buf[len] = '\0';
+    return buf;
 }

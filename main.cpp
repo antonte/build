@@ -6,7 +6,13 @@
 int main(int argc, char *argv[])
 {
     readConfig();
-    release = (argc == 2 && argv[1] == std::string("release"));
+    release = false;
+    archive = false;
+    for (int i = 1; i < argc; ++i)
+        if (argv[i] == std::string("release"))
+            release = true;
+        else if (argv[i] == std::string("a"))
+            archive = true;
     try
     {
         BinRule target;
