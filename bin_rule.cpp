@@ -8,6 +8,7 @@
 #include <iostream>
 #include <set>
 #include <vector>
+#include <stdexcept>
 #include <sys/types.h>
 #include <dirent.h>
 

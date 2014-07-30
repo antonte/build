@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <stdexcept>
 
 ObjRule::ObjRule(std::string sourceFile):
     sourceFile_(sourceFile)
