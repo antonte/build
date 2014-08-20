@@ -30,7 +30,7 @@ void ObjRule::internalResolve()
 {
     {
         std::ostringstream cmd;
-        cmd << "g++ -Wall -march=native -gdwarf-3 -g -std=c++11 -c ";
+        cmd << "g++ -Wall -march=native -gdwarf-3 -g -std=c++1y -c ";
         if (release)
             cmd << "-O3 ";
         if (exists(incDir))
@@ -44,7 +44,7 @@ void ObjRule::internalResolve()
     }
     {
         std::ostringstream cmd;
-        cmd << "g++ -Wall -march=native -gdwarf-3 -g -std=c++11 -MM -c ";
+        cmd << "g++ -Wall -march=native -gdwarf-3 -g -std=c++1y -MM -c ";
         if (release)
             cmd << "-O3 ";
         if (exists(incDir))
@@ -62,7 +62,7 @@ void ObjRule::internalResolve()
     }
     {
         std::ostringstream cmd;
-        cmd << "g++ -Wall -march=native -gdwarf-3 -g -std=c++11 -E -c ";
+        cmd << "g++ -Wall -march=native -gdwarf-3 -g -std=c++1y -E -c ";
         if (release)
             cmd << "-O3 ";
         if (exists(incDir))

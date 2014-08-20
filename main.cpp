@@ -1,4 +1,4 @@
-// g++ *.cpp -o build -g -Wall -std=c++11
+// g++ *.cpp -o build -g -Wall -std=c++1y
 #include "bin_rule.hpp"
 #include "config.hpp"
 #include <iostream>
