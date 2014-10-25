@@ -5,7 +5,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <sys/param.h>
-
+#ifdef __APPLE__
+#include <mach-o/dyld.h>
+#endif
 
 bool exists(std::string fileName)
 {
@@ -72,6 +74,7 @@ std::string absolutePath(std::string path)
         return path;
 }
 
+#ifndef __APPLE__
 std::string getExecutableName()
 {
     char buf[MAXPATHLEN];
@@ -80,3 +83,16 @@ std::string getExecutableName()
         buf[len] = '\0';
     return buf;
 }
+#else
+std::string getExecutableName()
+{
+    char exe[MAXPATHLEN];
+    uint32_t bufSize = sizeof(exe);
+    _NSGetExecutablePath(exe, &bufSize);
+    char buf[MAXPATHLEN];
+    ssize_t len;
+    if ((len = readlink(exe, buf, sizeof(buf) - 1)) != -1)
+        buf[len] = '\0';
+    return buf;
+}
+#endif
