@@ -31,7 +31,7 @@ void BinRule::internalResolve()
   if (!archive)
   {
     std::ostringstream cmd;
-    cmd << "g++ -march=native -gdwarf-3 ";
+    cmd << "g++ -march=native -gdwarf-3 -pthread ";
     if (exists(libDir))
       cmd << "-L" << libDir << " ";
     for (auto &d: dependencies_)
