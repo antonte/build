@@ -21,8 +21,12 @@ BinRule::BinRule()
     target_ = "lib" + filename(current_path()) + ".a";
   std::unique_ptr<DIR, decltype(&closedir)> d(opendir("."), &closedir);
   while (auto de = readdir(d.get()))
-    if (de->d_type == DT_REG && extension(de->d_name) == "cpp")
+  {
+    if ((de->d_type == DT_REG || de->d_type == DT_LNK /* assume for now all symlinks are files, not a directory */) && extension(de->d_name) == "cpp")
+    {
       dependencies_.push_back(std::unique_ptr<ObjRule>(new ObjRule(de->d_name)));
+    }
+  }
 }
 
 void BinRule::internalResolve()
